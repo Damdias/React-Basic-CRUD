@@ -12,6 +12,7 @@ let customers = [
     }
 ]
 class CustomerPage extends React.Component {
+    
     constructor(props) {
         super(props);
         this.state = {
@@ -21,11 +22,22 @@ class CustomerPage extends React.Component {
                 lastName: ""
             },
             formTitle: 'Create New Customer',
-            isNew: true
+            isNew: true,
+            index: 0
         };
         this.editCutomer = this.editCutomer.bind(this);
         this.deleteCustomer = this.deleteCustomer.bind(this);
         this.createCustomer = this.createCustomer.bind(this);
+        this.onSave = this.onSave.bind(this);
+        this.onTextChanged = this.onTextChanged.bind(this);
+    }
+    onSave() {
+        this.createCustomer(this.state.selectedCustomer);
+    }
+    onTextChanged(e) {
+        var newc = Object.assign({},this.state.selectedCustomer);
+        newc[e.target.id] = e.target.value;
+        this.setState({selectedCustomer: newc});
     }
     createCustomer(customer) {
 
@@ -34,13 +46,17 @@ class CustomerPage extends React.Component {
             newc.push(customer);
         }
         else {
-            var index = newc.findIndex(x => x.firstName === customer.firstName);
+          let index = this.state.index;
             newc[index].firstName = customer.firstName;
             newc[index].lastName = customer.lastName;
         }
         this.setState({
             customers: newc,
             formTitle: 'Create New Customer',
+            selectedCustomer: {
+                firstName: '',
+                lastName: ''
+            },
             isNew: true
         });
     }
@@ -48,10 +64,12 @@ class CustomerPage extends React.Component {
         var newc = Object.assign({}, this.state.selectedCustomer);
         this.state.selectedCustomer.firstName = customer.firstName;
         this.state.selectedCustomer.lastName = customer.lastName;
+        let index = this.state.customers.findIndex(x => x.firstName === customer.firstName);
         this.setState((pre => ({
             selectedCustomer: pre.selectedCustomer,
             formTitle: 'Edit Customer',
-            isNew: false
+            isNew: false,
+            index:index
         })));
 
 
@@ -67,7 +85,7 @@ class CustomerPage extends React.Component {
             <div className="col-lg-8">
 
                 <CustomerAddModal customer={this.state.selectedCustomer}
-                    createCustomer={this.createCustomer} title={this.state.formTitle} />
+                    onSave={this.onSave} onTextChanged={this.onTextChanged} title={this.state.formTitle} />
                 <CustomerList editHandler={this.editCutomer} deleteHandler={this.deleteCustomer} customers={this.state.customers} />
 
             </div>
