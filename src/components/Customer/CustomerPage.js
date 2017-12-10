@@ -20,26 +20,41 @@ class CustomerPage extends React.Component {
                 firstName: "",
                 lastName: ""
             },
-            formTitle: ''
+            formTitle: 'Create New Customer',
+            isNew: true
         };
         this.editCutomer = this.editCutomer.bind(this);
         this.deleteCustomer = this.deleteCustomer.bind(this);
         this.createCustomer = this.createCustomer.bind(this);
     }
     createCustomer(customer) {
+
         var newc = this.state.customers.slice();
-        newc.push(customer);
-        this.setState({ customers: newc });
+        if (this.state.isNew) {
+            newc.push(customer);
+        }
+        else {
+            var index = newc.findIndex(x => x.firstName === customer.firstName);
+            newc[index].firstName = customer.firstName;
+            newc[index].lastName = customer.lastName;
+        }
+        this.setState({
+            customers: newc,
+            formTitle: 'Create New Customer',
+            isNew: true
+        });
     }
     editCutomer(customer) {
-       var newc = Object.assign({}, this.state.selectedCustomer);
-       this.state.selectedCustomer.firstName = "datmi";
-        this.setState((pre=> ({
+        var newc = Object.assign({}, this.state.selectedCustomer);
+        this.state.selectedCustomer.firstName = customer.firstName;
+        this.state.selectedCustomer.lastName = customer.lastName;
+        this.setState((pre => ({
             selectedCustomer: pre.selectedCustomer,
-            formTitle: 'Edit Customer infor',
+            formTitle: 'Edit Customer',
+            isNew: false
         })));
-        console.log(this.state.selectedCustomer);
-      
+
+
     }
     deleteCustomer(customer) {
         var newc = this.state.customers.slice();
@@ -51,8 +66,8 @@ class CustomerPage extends React.Component {
         return (
             <div className="col-lg-8">
 
-                <CustomerAddModal customer = {this.state.selectedCustomer}
-                     createCustomer={this.createCustomer} title={this.state.formTitle} />
+                <CustomerAddModal customer={this.state.selectedCustomer}
+                    createCustomer={this.createCustomer} title={this.state.formTitle} />
                 <CustomerList editHandler={this.editCutomer} deleteHandler={this.deleteCustomer} customers={this.state.customers} />
 
             </div>
